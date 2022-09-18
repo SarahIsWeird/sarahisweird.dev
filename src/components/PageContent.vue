@@ -2,7 +2,7 @@
     <div id="content">
         <aside>
             <div class="photo">
-                <img src="me%201.jpg" alt="A selfie of me.">
+                <img src="me%201.jpg" loading="lazy" alt="A selfie of me.">
             </div>
             <div class="links">
                 <div class="link"><a href="https://github.com/SarahIsWeird">GitHub</a></div>
