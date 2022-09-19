@@ -1,5 +1,9 @@
 <template>
-    <div id="nameTyper">
+    <div v-if="prefersReducedMotion" id="nameTyper">
+        <span>Hi! My name is </span><br />
+        <span><b>Sarah Klocke</b>.</span>
+    </div>
+    <div v-else id="nameTyper">
         <span>Hi! My name is </span><br />
         <span><b>{{ dynamicName }}</b></span>
         <span v-if="doneTyping">.</span>
@@ -21,6 +25,8 @@ export default {
             currentLetter: 0,
             isDeleting: false,
             doneTyping: false,
+            reducedMotionQuery: window.matchMedia('(prefers-reduced-motion: reduce)'),
+            prefersReducedMotion: false,
         };
     },
     methods: {
@@ -79,6 +85,10 @@ export default {
     },
     mounted() {
         setTimeout(this.addLetter, 1000);
+
+        this.reducedMotionQuery.addEventListener('change', () => {
+            this.prefersReducedMotion = this.reducedMotionQuery.matches;
+        });
     }
 };
 </script>
