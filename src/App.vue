@@ -14,18 +14,21 @@ export default {
 </script>
 
 <style>
+html, #app {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+
+    color: white;
+    background-color: black;
+}
+
 #app {
     font-family: 'Fira Code VF', monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
 
-    color: white;
-    background-color: black;
-
     font-size: medium;
-
-    overflow: hidden;
 }
 
 * {

@@ -20,6 +20,8 @@ export default {
 
 <style scoped lang="scss">
 #navigationBar {
+    position: fixed;
+
     width: calc(100vw);
     height: calc(5em - 1px);
 
@@ -30,6 +32,7 @@ export default {
     gap: 2.5vw;
 
     border-bottom: 1px solid #303030;
+    background-color: inherit;
 }
 
 #navigationTitle {

@@ -32,9 +32,10 @@ export default {
 <style scoped lang="scss">
 #content {
     width: 100vw;
-    height: calc(100vh - 7em);
+    min-height: calc(100vh - 7em);
+    min-height: -webkit-fill-available;
 
-    padding-top: 2em;
+    padding-top: 7em;
 
     display: flex;
 
@@ -82,6 +83,12 @@ main {
 @media only screen and (min-width: 751px) {
     .links, .link {
         display: none;
+    }
+}
+
+@media only screen and(max-width: 750px) {
+    main {
+        font-size: 3.25vw;
     }
 }
 </style>
