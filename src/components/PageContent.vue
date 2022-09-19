@@ -38,7 +38,8 @@ export default {
 
     display: flex;
 
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 aside {

@@ -24,6 +24,8 @@ export default {
     background-color: black;
 
     font-size: medium;
+
+    overflow: hidden;
 }
 
 * {

@@ -49,7 +49,7 @@
                     <li>work only</li>
                 </ul>
             </ul>
-            <h2>HTML/CSS/JavaScript</h2>
+            <h2>HTML/<wbr>CSS/<wbr>JavaScript</h2>
             <ul>
                 <li><a href="https://github.com/SarahIsWeird/rubiksinfo/tree/main/frontend" target="_blank">React</a></li>
                 <ul>
@@ -114,6 +114,10 @@ export default {
 
         ul {
             margin-left: 2em;
+        }
+
+        h1 {
+            line-height: 2.5rem;
         }
     }
 }
