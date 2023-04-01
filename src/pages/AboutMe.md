@@ -54,7 +54,7 @@ functional programming in general.
 
 ## Python
 
-I **despise** Python. I had to work with it because of a university project, in which we're
+I don't like Python. I had to work with it because of a university project, in which we're
 trying to teach a humanoid robot to play concentration. If you want to read about it,
 you can read the (German) paper [here](https://sarahisweird.dev/NAO-Memory.pdf).
 Note: I've mostly worked on the image recognition itself.
