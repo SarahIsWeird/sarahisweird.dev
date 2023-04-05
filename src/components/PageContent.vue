@@ -27,17 +27,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
+//noinspection CssInvalidPropertyValue
 #content {
     width: 100vw;
+    width: -webkit-fill-available;
     min-height: calc(100vh - 7em);
     min-height: -webkit-fill-available;
 
     padding-top: 7em;
 
     display: flex;
-
-    overflow-x: hidden;
-    overflow-y: scroll;
 }
 
 aside {

@@ -23,7 +23,7 @@ export default {
     position: fixed;
     z-index: 1;
 
-    width: calc(100vw);
+    width: 100vw;
     height: calc(5em - 1px);
 
     line-height: 5em;
