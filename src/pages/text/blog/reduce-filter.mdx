@@ -1,0 +1,416 @@
+<div className="title">
+    # The Reduce image filter
+</div>
+
+A few years ago I wrote the first prototype of a program called
+[img-filter](https://github.com/SarahIsWeird/img-filter). It was pretty slow, but I'd been interested in image
+processing for a long time, and I was wondering if I could create cool effects on my own. The first ones weren't very
+interesting, like extracting only the red channel of the image. However, I stumbled upon a filter I really like, which
+is the reduce filter. I'm going to share the ins and outs of it with you here, as well as some theory behind images.
+The goal is that even if you haven't worked with images yet, you still can get a feel for how this all fits together.
+
+The TL;DR is that we generate a subset of colors and replace every pixel in the image with the closest color of that
+subset. My version of the filter uses equidistant values for each channel. If you want, you can jump straight to
+either the <a href="#generating-color-palettes" target="_self">color palette generation</a>
+or the <a href="#result" target="_self">result</a>.
+
+## What is an image, anyway?
+
+An image is basically just a big two-dimensional array of pixels. A pixel consists of three values, one for red, one for
+green and one for blue. Sometimes there's also a fourth value for transparency called alpha, but we're going to ignore
+transparency here. We can also split an image into three sub-images only consisting of one of those three values. This
+sub-image is called a *color channel*, or just *channel* for short. Since we work with 24-bit-color images, the values
+in the channels range from $0$ to $255$, so each value in the channels is represented by one byte.
+($24\ bits / 3\ channels = 8\ bits/channel = 1\ byte / channel$)
+
+Let's try to write it down a bit more mathematically, since that's going to help us later. Let's denote the image as
+$I$. That image $I$ with width $w$ and height $h$ consists of pixels $p_{xy}$:
+
+$
+I=\begin{pmatrix}
+    p_{1,1} & p_{2,1} & p_{3,1} & ... & p_{w,1} \\
+    p_{1,2} & p_{2,2} & p_{3,2} & ... & p_{w,2} \\
+    p_{1,3} & p_{2,3} & p_{3,3} & ... & p_{w,3} \\
+    ... & ... & ... & ... & ... \\
+    p_{1,h} & p_{2,h} & p_{3,h} & ... & p_{wh}
+\end{pmatrix}
+$, where $
+p_{xy} = \begin{pmatrix}
+    r_{xy} \\
+    g_{xy} \\
+    b_{xy}
+\end{pmatrix}.
+$
+
+## Extracting the red channel
+
+These definitions aren't very useful on their own. Let's do something fun with them: Extract an image channel!
+
+The red channel $I_R$ in of itself doesn't do us much good when we try to display it as an image. It only has one value
+for each pixel, but we need three. To help us, we can define a function $getR$ this:
+
+$
+getR(p) = getR(\begin{pmatrix}
+    r \\
+    g \\
+    b
+\end{pmatrix}) = \begin{pmatrix}
+    r \\
+    0 \\
+    0
+\end{pmatrix}
+$
+
+We just set the other channels to $0$. This means that only the values in the red channels are passed into the final
+image. We can now apply this function to every pixel in the image:
+
+$
+getR(I) = getR(\begin{pmatrix}
+    p_{1,1} & p_{2,1} & p_{3,1} & ... & p_{w,1} \\
+    p_{1,2} & p_{2,2} & p_{3,2} & ... & p_{w,2} \\
+    p_{1,3} & p_{2,3} & p_{3,3} & ... & p_{w,3} \\
+    ... & ... & ... & ... & ... \\
+    p_{1,h} & p_{2,h} & p_{3,h} & ... & p_{wh}
+\end{pmatrix}) = \begin{pmatrix}
+    getR(p_{1,1}) & getR(p_{2,1}) & getR(p_{3,1}) & ... & getR(p_{w,1}) \\
+    getR(p_{1,2}) & getR(p_{2,2}) & getR(p_{3,2}) & ... & getR(p_{w,2}) \\
+    getR(p_{1,3}) & getR(p_{2,3}) & getR(p_{3,3}) & ... & getR(p_{w,3}) \\
+    ... & ... & ... & ... & ... \\
+    getR(p_{1,h}) & getR(p_{2,h}) & getR(p_{3,h}) & ... & getR(p_{wh})
+\end{pmatrix}
+$
+
+This might look complicated, but it's really not. This is the same thing written in pseudocode:
+
+```js
+for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+        newImage[x][y] = getR(image[x][y]);
+    }
+}
+```
+
+This is what that looks like:
+
+<div className="two-images">
+    <div>
+        <img src="/assets/reduce-filter/doggo.png" alt="Original image" />
+        <span>Original</span>
+    </div>
+    <div>
+        <img src="/assets/reduce-filter/doggo-red.png" alt="Image with only the red channel" />
+        <span>Image with only the red channel</span>
+    </div>
+</div>
+
+Of course we can do the same thing with the green and blue channels, respectively!
+
+$
+getG(\begin{pmatrix}
+r \\
+g \\
+b
+\end{pmatrix}) = \begin{pmatrix}
+0 \\
+g \\
+0
+\end{pmatrix},\ getB(\begin{pmatrix}
+r \\
+g \\
+b
+\end{pmatrix}) = \begin{pmatrix}
+0 \\
+0 \\
+b
+\end{pmatrix}
+$
+
+And the resulting images are as (un-)interesting as the red one:
+
+<div className="two-images">
+    <div>
+        <img src="/assets/reduce-filter/doggo-green.png" alt="Image with only the green channel" />
+        <span>Image with only the green channel</span>
+    </div>
+    <div>
+        <img src="/assets/reduce-filter/doggo-blue.png" alt="Image with only the blue channel" />
+        <span>Image with only the blue channel</span>
+    </div>
+</div>
+
+## Okay, why do we even need the math?
+
+Of course, the math definitions didn't do us much good until now, they only made things more convoluted. The reality
+is however, that most image processing is entirely reliant on the fact that you can view images as matrices! The cool
+thing is that you can do almost anything with images if you view them as a matrix: you can multiply them with other
+special matrices to rotate, scale, and stretch them. Alternatively, you can define functions for either the entire
+matrix or just single pixel values to change how they look. That's what we've just done, even if it was pretty boring.
+
+We also saw that we can represent the RGB values of a pixel as a vector $r_{xy}$. This is a really useful abstraction,
+because it lets us put the three channels into relation! For example, we can define the distance between two colors
+as the length of the difference of the two vectors:
+
+$
+d(c_1,c_2) = |c_2-c_1| = \left|\begin{pmatrix}
+    r_2 - r_1 \\
+    g_2 - g_1 \\
+    b_2 - b_1
+\end{pmatrix}\right| = \sqrt{(r_2 - r_1)^2 + (g_2 - g_1)^2 + (b_2 - b_1)^2}
+$
+
+This color distance definition is a naïve one, since it doesn't factor in perceptual differences of colors. Color
+spaces are a complex topic, and if you wish to know more about it, check out the [Wikipedia article on color
+difference](https://en.wikipedia.org/wiki/Color_difference). There's a lot of math we could do to improve our
+distance definition, but for this filter it's sufficient. If you're feeling adventurous, definitely try to implement
+the filter with alternative color spaces and tell me how it goes!
+
+Since we won't actually use the distance itself, and we only compare two distances with each other, we can actually
+leave out the square root and compare the squared distances! This saves us having to compute the square root for
+each distance, which does add up for big images.
+
+$
+d(c_1,c_2)^2 = (r_2 - r_1)^2 + (g_2 - g_1)^2 + (b_2 - b_1)^2
+$
+
+And of course, we can also represent this pretty easily in code:
+
+```js
+const distanceSquared = (c1, c2) => {
+    const dR = c2[0] - c1[0];
+    const dG = c2[1] - c1[1];
+    const dB = c2[2] - c1[2];
+
+    return dR * dR + dG * dG + dB * dB;
+};
+```
+
+If we have a set of colors $S$, we can now find the closest color in that set for another color not in that set.
+For that, we first calculate all distances of $c$ to the colors in $S$, which gives us a new set $D$.
+With that, we define the closest match $m$ to have the least distance to $c$:
+
+$ d(c,m) = min(D), $ where $ D = \left\{d(c,x)|x\in S\right\} $
+
+Suppose we have the colors <span style="background-color: #ff0000;">red</span>,
+<span style="color: #000000; background-color: #00ff00;">green</span> and
+<span style="background-color: #0000ff;">blue</span>:
+
+$
+S = \left\{\begin{pmatrix}
+    255 \\
+    0 \\
+    0
+\end{pmatrix},\begin{pmatrix}
+    0 \\
+    255 \\
+    0
+\end{pmatrix},\begin{pmatrix}
+    0 \\
+    0 \\
+    255
+\end{pmatrix}\right\}
+$
+
+and a fourth color <span style="color: #000000; background-color: #ff8888">pink</span>,
+
+$
+c=\begin{pmatrix}
+    255 \\
+    127 \\
+    127
+\end{pmatrix}
+$.
+
+We can first calculate $D$ and with that the color $m$ with the lowest distance:
+
+$
+\begin{split}
+D & = \left\{d(c, \text{red}), d(c, \text{green}), d(c, \text{blue})\right\} \\
+  & = \left\{179.61, 312.31, 312.31\right\}
+\end{split}
+$
+
+$ \Rightarrow d(c,\text{red}) = min(D) $
+
+$
+\Rightarrow m = \text{red}=\begin{pmatrix}
+    255 \\
+    0 \\
+    0
+\end{pmatrix}
+$
+
+This works a little bit better in code, because we can actually just sort $D$ to get our best color! We also store
+the colors of $S$ in $D$ as well, since that makes it a little bit easier for us to get $m$. Lastly, we use the
+squared distance instead of the distance, since it's computationally faster.
+
+```js
+const findClosestColor = (S, c) => {
+    const D = S.map(colorInS => ({
+        color: colorInS,
+        distance: distanceSquared(colorInS, c)
+    }));
+
+    const sortedD = D.sortBy(obj => obj.distance);
+
+    return sortedD[0].color;
+};
+
+const colors = [
+    [255, 0, 0],
+    [0, 255, 0],
+    [0, 0, 255]
+];
+
+findClosestColor(colors, [255, 127, 127]) === [255, 0, 0]
+```
+
+So, red is the closest color to pink! That's... pretty obvious. But of course, I picked an example that's relatively
+easy to follow. We're not limited to any amount of colors though, so we can pick and choose $S$ as we like.
+
+## Generating color palettes <span class="anchor-span" id="generating-color-palettes"></span>
+
+And choosing $S$ is definitely the fun part! You can be as creative as you like here, because every set, or palette,
+how it's usually known, will get you a different cool effect. The way I originally intended the effect was to reduce
+the numbers to $n^3$ equally spaced colors. In the end, I separated the parameters for each channel, since the
+effect works a bit better that way.
+
+The idea is that we have three parameters $n_r \geq 2$, $n_g \geq 2$ and $n_b \geq 2$ that tell us how many values
+we allow in each channel. In total, we get $n_r*n_g*n_b$ colors. We can define the values of a channel $C$ dependent
+on $n$, where we generate a palette with equally spaced values, with the space between them being $s$.
+
+$
+C(n)=\left\{\left\lfloor s*i\right\rfloor\ |\ i\in \mathbb{N}_0, 0 \leq i < n\right\},
+\text{where}\ s=255 / (n - 1)
+$
+
+This looks pretty complicated, but again, the code might be a bit simpler to understand:
+
+```js
+const getEquallySpacedValues = (n) => {
+    const step = 255 / (n - 1);
+    const result = [];
+
+    for (let i = 0; i < n; i++) {
+        result.push(Math.floor(step * i));
+    }
+
+    return result;
+};
+```
+
+With these equally spaced values, we can now build our color palette:
+
+$
+S(n_r, n_g, n_b) = \left\{\left.\begin{pmatrix}
+    r \\
+    g \\
+    b
+\end{pmatrix} \right|\ r \in C(n_r), g \in C(n_g), b \in C(n_b)\right\}
+$
+
+Or, in code:
+
+```js
+const buildColorPalette = (nR, nG, nB) => {
+    const S = [];
+
+    for (const r in getEquallySpacedValues(nR)) {
+        for (const g in getEquallySpacedValues(nG)) {
+            for (const b in getEquallySpacedValues(nB)) {
+                S.push([r, g, b]);
+            }
+        }
+    }
+
+    return S;
+};
+```
+
+So let's look at the simplest case, $n_r=n_g=n_b=2$. This means that we allow $2^3=8$ colors in our image,
+<span style="color: #fff; background-color: #000">black</span>,
+<span style="background-color: #f00">red</span>,
+<span style="color: #000; background-color: #0f0">green</span>,
+<span style="background-color: #00f">blue</span>,
+<span style="color: #000; background-color: #ff0">yellow</span>,
+<span style="color: #000; background-color: #f0f">magenta</span>,
+<span style="color: #000; background-color: #0ff">cyan</span> and
+<span style="color: #000; background-color: #fff">white</span>.
+
+$
+S=\left\{
+\begin{pmatrix}
+    0 \\
+    0 \\
+    0
+\end{pmatrix}, \begin{pmatrix}
+    255 \\
+    0 \\
+    0
+\end{pmatrix}, \begin{pmatrix}
+    0 \\
+    255 \\
+    0
+\end{pmatrix}, \begin{pmatrix}
+    0 \\
+    0 \\
+    255
+\end{pmatrix}, \begin{pmatrix}
+    255 \\
+    255 \\
+    0
+\end{pmatrix}, \begin{pmatrix}
+    255 \\
+    0 \\
+    255
+\end{pmatrix}, \begin{pmatrix}
+    0 \\
+    255 \\
+    255
+\end{pmatrix}, \begin{pmatrix}
+    255 \\
+    255 \\
+    255
+\end{pmatrix}
+\right\}
+$
+
+## The result! <span class="anchor-span" id="result"></span>
+
+We have everything now! We have generated ourselves a reduced color palette and know how to find the closest color
+for a given color. Let's do that for every pixel in the image now!
+
+```js
+const colorPalette = buildColorPalette(2, 2, 2);
+
+for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+        newImage[x][y] = findClosestColor(colorPalette, image[x][y]);
+    }
+}
+```
+
+And the result looks like this:
+
+<div className="two-images">
+    <div>
+        <img src="/assets/reduce-filter/doggo.png" alt="The original image" />
+        <span>The original image</span>
+    </div>
+    <div>
+        <img src="/assets/reduce-filter/doggo-reduced-222.png" alt="The image with the reduced color palette" />
+        <span>The image with the reduced color palette</span>
+    </div>
+</div>
+
+Since we only have so few colors available in our palette, the result is mostly just red, yellow, white and black.
+But since we've defined some functions instead of hard-coding stuff, we can try out my favourite permutation,
+$n_r=3$, $n_g=4$ and $n_b=3$!
+
+<div className="two-images">
+    <div>
+        <img src="/assets/reduce-filter/doggo-reduced-343.png" alt="The image reduced with three reds, four greens and three blues" />
+        <span>The image reduced with $n_r=3$, $n_g=4$ and $n_b=3$</span>
+    </div>
+</div>
+
+And I think that that looks pretty dope.

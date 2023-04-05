@@ -8,12 +8,19 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@mapbox/rehype-prism": "^0.8.0",
+    "@mdx-js/loader": "^2.3.0",
     "core-js": "^3.8.3",
     "marked": "^4.1.0",
     "node-sass": "^7.0.3",
     "raw-loader": "^4.0.2",
+    "rehype-highlight": "^6.0.0",
+    "rehype-mathjax": "^4.0.2",
+    "remark-gfm": "^3.0.1",
+    "remark-math": "^5.1.1",
     "sass-loader": "^13.0.2",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

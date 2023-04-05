@@ -1,11 +1,11 @@
 <template>
     <div id="navigationBar">
         <div id="navigationTitle">
-            Sarah's Portfolio
+            <router-link class="title-link" to="/" target="_self">Sarah's Portfolio</router-link>
         </div>
         <div id="navigationLinks">
+            <span class="link"><a href="/blog" target="_self">Blog</a></span>
             <span class="link"><a href="https://github.com/SarahIsWeird">GitHub</a></span>
-            <span class="link"><a href="https://twitter.com/WeirdDevSarah">Twitter</a></span>
             <span class="link"><a href="https://last.fm/user/SarahIsWeird">last.fm</a></span>
             <span class="link">Discord: Sarah.#0069</span>
         </div>
@@ -21,6 +21,7 @@ export default {
 <style scoped lang="scss">
 #navigationBar {
     position: fixed;
+    z-index: 1;
 
     width: calc(100vw);
     height: calc(5em - 1px);
@@ -47,6 +48,10 @@ export default {
     display: flex;
     justify-content: left;
     gap: 2.5vw;
+}
+
+.title-link {
+    text-decoration: none;
 }
 
 @media only screen and (max-width: 900px) {

@@ -2,11 +2,11 @@
     <div id="content">
         <aside>
             <div class="photo">
-                <img src="me%201.jpg" loading="lazy" alt="A selfie of me.">
+                <img src="/me%201.jpg" loading="lazy" alt="A selfie of me.">
             </div>
             <div class="links">
+                <div class="link"><router-link to="/blog">Blog</router-link></div>
                 <div class="link"><a href="https://github.com/SarahIsWeird">GitHub</a></div>
-                <div class="link"><a href="https://twitter.com/WeirdDevSarah">Twitter</a></div>
                 <div class="link"><a href="https://last.fm/user/SarahIsWeird">last.fm</a></div>
                 <div class="link">
                     Discord:<br />
@@ -15,17 +15,14 @@
             </div>
         </aside>
         <main>
-            <AboutMe />
+            <slot></slot>
         </main>
     </div>
 </template>
 
 <script>
-import AboutMe from '@/components/AboutMe';
-
 export default {
     name: 'PageContent',
-    components: { AboutMe }
 };
 </script>
 

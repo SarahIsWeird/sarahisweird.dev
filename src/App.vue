@@ -1,15 +1,17 @@
 <template>
     <NavigationBar />
-    <PageContent />
+    <PageContent>
+        <router-view></router-view>
+    </PageContent>
 </template>
 
 <script>
-import PageContent from '@/components/PageContent';
 import NavigationBar from '@/components/NavigationBar';
+import PageContent from "@/components/PageContent.vue";
 
 export default {
     name: 'App',
-    components: { NavigationBar, PageContent },
+    components: { PageContent, NavigationBar },
 }
 </script>
 

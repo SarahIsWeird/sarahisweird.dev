@@ -96,6 +96,7 @@ export default {
 <style scoped>
 #nameTyper {
     font-size: min(2em, 6vw);
+    margin-bottom: 1rem;
 }
 
 @keyframes blink {
