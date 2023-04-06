@@ -29,7 +29,7 @@ export default {
 <style scoped lang="scss">
 //noinspection CssInvalidPropertyValue
 #content {
-    width: 100vw;
+    width: 100%;
     width: -webkit-fill-available;
     min-height: calc(100vh - 7em);
     min-height: -webkit-fill-available;
