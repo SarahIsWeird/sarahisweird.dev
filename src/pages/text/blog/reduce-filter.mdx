@@ -1,13 +1,17 @@
 <div className="title">
-    # The Reduce image filter
+    # The reduce image filter
 </div>
 
 A few years ago I wrote the first prototype of a program called
 [img-filter](https://github.com/SarahIsWeird/img-filter). It was pretty slow, but I'd been interested in image
 processing for a long time, and I was wondering if I could create cool effects on my own. The first ones weren't very
 interesting, like extracting only the red channel of the image. However, I stumbled upon a filter I really like, which
-is the reduce filter. I'm going to share the ins and outs of it with you here, as well as some theory behind images.
-The goal is that even if you haven't worked with images yet, you still can get a feel for how this all fits together.
+is the reduce filter.
+
+I'm going to share the ins and outs of it with you here, as well as some theory behind images. The goal is that even
+if you haven't worked with images yet, you still can get a feel for how this all fits together. Don't get scared by
+the math! All the math excluding the color distances is not that important anyway and just serves as a background for
+image processing in general.
 
 The TL;DR is that we generate a subset of colors and replace every pixel in the image with the closest color of that
 subset. My version of the filter uses equidistant values for each channel. If you want, you can jump straight to
@@ -94,8 +98,8 @@ This is what that looks like:
 
 <div className="two-images">
     <div>
-        <img src="/assets/reduce-filter/doggo.png" alt="Original image" />
-        <span>Original</span>
+        <img src="/assets/reduce-filter/doggo.png" alt="The original image" />
+        <span>You might be wondering why I've gathered y'all here today</span>
     </div>
     <div>
         <img src="/assets/reduce-filter/doggo-red.png" alt="Image with only the red channel" />
@@ -409,7 +413,7 @@ $n_r=3$, $n_g=4$ and $n_b=3$!
 <div className="two-images">
     <div>
         <img src="/assets/reduce-filter/doggo-reduced-343.png" alt="The image reduced with three reds, four greens and three blues" />
-        <span>The image reduced with $n_r=3$, $n_g=4$ and $n_b=3$</span>
+        <span>The best boye!</span>
     </div>
 </div>
 
