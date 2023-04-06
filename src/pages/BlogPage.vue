@@ -1,41 +1,40 @@
 <template>
     <MdxRenderer class="blog-entry">
         <a href="/blog" target="_self">&lt; Back to all blogs</a>
-        <component :is="currentBlogPage"></component>
+        <component :is="currentBlogPage" />
     </MdxRenderer>
 </template>
 
 <script>
 import MdxRenderer from "@/components/MdxRenderer.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import {defineAsyncComponent, markRaw} from "vue";
-
-const blogPages = {
-    'reduce-filter': defineAsyncComponent(() => import('@/pages/text/blog/reduce-filter.mdx')),
-};
 
 export default {
     name: "BlogPage",
-    components: {
-        MdxRenderer
-    },
     props: {
         id: String,
     },
+    components: {
+        LoadingSpinner,
+        MdxRenderer,
+    },
     data() {
         return {
-            currentBlogPage: 'component',
+            currentBlogPage: 'component'
         };
     },
     mounted() {
-            const id = this.$route.params.id;
+        const component = defineAsyncComponent({
+            loader: () => import(`@/pages/text/blog/${this.id}.mdx`),
+            loadingComponent: LoadingSpinner,
+            onError: () => {
+                this.$router.push('/blog');
+            },
+        });
 
-            if (blogPages[id] !== undefined) {
-                this.currentBlogPage = markRaw(blogPages[id]);
-                return;
-            }
-
-            this.$router.push('/blog');
-    }
+        this.currentBlogPage = markRaw(component);
+    },
 }
 </script>
 
