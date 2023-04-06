@@ -1,0 +1,41 @@
+name: Continuous Deployment
+on:
+  push:
+    branches:
+      -main
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout git repository
+        uses: actions/checkout@v3.5.0
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 18.x
+      - name: Install node dependencies
+        run: npm install
+      - name: Build app distribution
+        run: npm run build
+      - name: Compress the distribution
+        run: tar -cJf dist.tar.xz dist/*
+      - name: Install sshpass to pass the ssh password to scp
+        run: sudo apt-get install -y sshpass
+      - name: Copy known host into known_hosts
+        env:
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+        run: mkdir -p ~/.ssh && echo $KNOWN_HOSTS > ~/.ssh/known_hosts
+      - name: Copy the archive to the server
+        env:
+          SSH_SERVER: ${{ secrets.SSH_SERVER }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        run: sshpass -p "$SSH_PASSWORD" scp dist.tar.xz "$SSH_USERNAME"@"$SSH_SERVER":/srv/http/dist.tar.xz
+      - name: Unpack the distribution
+        env:
+          SSH_SERVER: ${{ secrets.SSH_SERVER }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        run: sshpass -p "$SSH_PASSWORD" ssh "$SSH_USERNAME"@"$SSH_SERVER" "/home/unpackHomepageDist.sh"
